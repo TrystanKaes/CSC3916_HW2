@@ -91,9 +91,9 @@ router.post('/signin', function(req, res) {
     };
 });
 
-router.all('/', function(req, res) {
-        res.status(404);
-        res.end('Route unavailable')
+router.all(function(req, res) {
+    res.status(404).json({success: false, msg: 'Route unavailable'});
+
 });
 
 app.use('/', router);
