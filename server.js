@@ -92,7 +92,8 @@ router.post('/signin', function(req, res) {
 });
 
 router.all('/', function(req, res) {
-        res.status(404).send({success: false, msg: 'Route unavailable'});
+        res.status(404);
+        res.end('Route unavailable')
 });
 
 app.use('/', router);
