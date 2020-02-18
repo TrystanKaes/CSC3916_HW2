@@ -73,22 +73,26 @@ router.post('/signup', function(req, res) {
 
 router.post('/signin', function(req, res) {
 
-        var user = db.findOne(req.body.username);
+    var user = db.findOne(req.body.username);
 
-        if (!user) {
-            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+    if (!user) {
+        res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+    }
+    else {
+        // check if password matches
+        if (req.body.password == user.password)  {
+            var userToken = { id : user.id, username: user.username };
+            var token = jwt.sign(userToken, process.env.SECRET_KEY);
+            res.json({success: true, token: 'JWT ' + token});
         }
         else {
-            // check if password matches
-            if (req.body.password == user.password)  {
-                var userToken = { id : user.id, username: user.username };
-                var token = jwt.sign(userToken, process.env.SECRET_KEY);
-                res.json({success: true, token: 'JWT ' + token});
-            }
-            else {
-                res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
-            }
-        };
+            res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+        }
+    };
+});
+
+router.all('/', function(req, res) {
+        res.status(404).send({success: false, msg: 'Route unavailable'});
 });
 
 app.use('/', router);
