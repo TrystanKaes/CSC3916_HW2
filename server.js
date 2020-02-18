@@ -20,7 +20,8 @@ function getJSONObject(req, _msg) {
         headers : "No Headers",
         key: process.env.UNIQUE_KEY,
         body : "No Body",
-        msg : "No Message"
+        msg : "No Message",
+        query : "No query"
     };
 
     if (req.body != null) {
@@ -63,7 +64,7 @@ router.route('/postjwt')
     );
 
 router.get('/', function(req, res) {
-    res.json({success: true, msg: 'Welcome'});
+    res.status(404).send({success: false, msg: 'Unsupported Request'});
 });
 
 router.post('/signup', function(req, res) {
