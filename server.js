@@ -15,11 +15,12 @@ app.use(passport.initialize());
 
 var router = express.Router();
 
-function getJSONObject(req) {
+function getJSONObject(req, _msg) {
     var json = {
         headers : "No Headers",
         key: process.env.UNIQUE_KEY,
-        body : "No Body"
+        body : "No Body",
+        msg : "No Message"
     };
 
     if (req.body != null) {
@@ -28,6 +29,10 @@ function getJSONObject(req) {
     if (req.headers != null) {
         json.headers = req.headers;
     }
+    if (req.query != null) {
+        json.query = req.query;
+    }
+        json.msg = _msg
 
     return json;
 }
@@ -56,6 +61,10 @@ router.route('/postjwt')
             res.send(req.body);
         }
     );
+
+router.get('/', function(req, res) {
+    res.json({success: true, msg: 'Welcome'});
+});
 
 router.post('/signup', function(req, res) {
     if (!req.body.username || !req.body.password) {
@@ -89,12 +98,31 @@ router.post('/signin', function(req, res) {
             res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
         }
     };
+
 });
+
+router.route('/movies')
+    .get(function(req, res) {
+        res.json(getJSONObject(req,'GET movies')).status(200).end();
+    })
+
+    .post(function(req, res) {
+        res.json(getJSONObject(req,'movie saved')).status(200).end()
+    })
+
+    .put(function(req, res) {
+        res.json(getJSONObject(req,'movie updated')).status(200).end()
+    })
+
+    .delete(function(req, res) {
+        res.json(getJSONObject(req,'movie deleted')).status(200).end()
+    })
 
 router.all(function(req, res) {
-    res.status(404).json({success: false, msg: 'Route unavailable'});
-
+    res.status(404).send({success: false, msg: 'Unsupported Request'});
 });
+
+
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
