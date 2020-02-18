@@ -119,7 +119,7 @@ router.route('/movies')
         res.json(getJSONObject(req,'movie deleted')).status(200).end()
     })
 
-router.all(function(req, res) {
+router.all('*', function(req, res) {
     res.status(404).send({success: false, msg: 'Unsupported Request'});
 });
 
