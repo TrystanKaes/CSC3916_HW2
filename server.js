@@ -60,6 +60,7 @@ router.route('/postjwt')
                 res = res.type(req.get('Content-Type'));
             }
             res.send(req.body);
+
         }
     );
 
@@ -108,16 +109,39 @@ router.route('/movies')
     })
 
     .post(function(req, res) {
-        res.json(getJSONObject(req,'movie saved')).status(200).end()
+        res.json(getJSONObject(req,'movie saved')).status(200).end();
     })
 
-    .put(function(req, res) {
-        res.json(getJSONObject(req,'movie updated')).status(200).end()
-    })
+    .put(authJwtController.isAuthenticated, function (req, res) {
+            console.log(req.body);
+            res = res.status(200);
+            if (req.get('Content-Type')) {
+                console.log("Content-Type: " + req.get('Content-Type'));
+                res = res.type(req.get('Content-Type'));
+            }
+            res.json(getJSONObject(req,'movie updated')).status(200).end()
+        }
+    )
 
     .delete(function(req, res) {
-        res.json(getJSONObject(req,'movie deleted')).status(200).end()
-    })
+
+        var user = db.findOne(req.body.username);
+
+        if (!user) {
+            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+        }
+        else {
+            // check if password matches
+            if (req.body.password == user.password)  {
+                res.json(getJSONObject(req,'movie deleted')).status(200).end();
+            }
+            else {
+                res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+            }
+        };
+
+        }
+    )
 
 router.all('*', function(req, res) {
     res.status(404).send({success: false, msg: 'Unsupported Request'});
